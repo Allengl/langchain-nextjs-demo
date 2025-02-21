@@ -100,10 +100,10 @@ function ChatInput(props: {
             {props.loading ? (
               <span role="status" className="flex justify-center">
                 <LoaderCircle className="animate-spin" />
-                <span className="sr-only">Loading...</span>
+                <span className="sr-only">加载中...</span>
               </span>
             ) : (
-              <span>Send</span>
+              <span>发送</span>
             )}
           </Button>
         </div>
@@ -298,14 +298,14 @@ export function ChatWindow(props: {
                       disabled={chat.messages.length !== 0}
                     >
                       <Paperclip className="size-4" />
-                      <span>Upload document</span>
+                      <span>上传文档</span>
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>Upload document</DialogTitle>
+                      <DialogTitle>上传文档</DialogTitle>
                       <DialogDescription>
-                        Upload a document to use for the chat.
+                        上传文档以用于聊天。
                       </DialogDescription>
                     </DialogHeader>
                     <UploadDocumentsForm />
@@ -323,7 +323,7 @@ export function ChatWindow(props: {
                     onCheckedChange={(e) => setShowIntermediateSteps(!!e)}
                   />
                   <label htmlFor="show_intermediate_steps" className="text-sm">
-                    Show intermediate steps
+                    显示中间步骤
                   </label>
                 </div>
               )}

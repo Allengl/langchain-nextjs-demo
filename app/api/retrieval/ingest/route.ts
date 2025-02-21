@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 
-import { createClient } from "@supabase/supabase-js";
-import { SupabaseVectorStore } from "@langchain/community/vectorstores/supabase";
-import { OpenAIEmbeddings } from "@langchain/openai";
-
-export const runtime = "edge";
+import { Milvus } from "@langchain/community/vectorstores/milvus";
+import { MilvusClient } from '@zilliz/milvus2-sdk-node';
+import { OllamaEmbeddings } from "@langchain/ollama";
+// export const runtime = "edge";
 
 // Before running, follow set-up instructions at
 // https://js.langchain.com/v0.2/docs/integrations/vectorstores/supabase
@@ -34,10 +33,8 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const client = createClient(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_PRIVATE_KEY!,
-    );
+
+
 
     const splitter = RecursiveCharacterTextSplitter.fromLanguage("markdown", {
       chunkSize: 256,
@@ -46,15 +43,28 @@ export async function POST(req: NextRequest) {
 
     const splitDocuments = await splitter.createDocuments([text]);
 
-    const vectorstore = await SupabaseVectorStore.fromDocuments(
-      splitDocuments,
-      new OpenAIEmbeddings(),
+
+    const embeddings = new OllamaEmbeddings({
+      model: process.env.OLLAMA_MODEL!,
+      baseUrl: process.env.OLLAMA_BASE_URL!,
+    });
+
+    const vectorstore = await Milvus.fromTexts(
+      [""],
+      [""],
+      embeddings,
       {
-        client,
-        tableName: "documents",
-        queryName: "match_documents",
-      },
+        collectionName: "test",
+        vectorField: 'vectors',
+        clientConfig: {
+          address: process.env.MILVUS_ADDRESS!,
+        },
+      }
     );
+
+
+
+
 
     return NextResponse.json({ ok: true }, { status: 200 });
   } catch (e: any) {

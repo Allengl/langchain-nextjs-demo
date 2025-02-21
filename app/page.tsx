@@ -6,47 +6,33 @@ export default function Home() {
     <GuideInfoBox>
       <ul>
         <li className="text-l">
-          🤝
+          🤖
           <span className="ml-2">
-            This template showcases a simple chatbot using{" "}
-            <a href="https://js.langchain.com/" target="_blank">
-              LangChain.js
-            </a>{" "}
-            and the Vercel{" "}
-            <a href="https://sdk.vercel.ai/docs" target="_blank">
-              AI SDK
-            </a>{" "}
-            in a{" "}
-            <a href="https://nextjs.org/" target="_blank">
-              Next.js
-            </a>{" "}
-            project.
+            欢迎使用智能问答助手！我是一个基于大语言模型的AI助手，可以回答您的各类问题。
           </span>
         </li>
         <li className="hidden text-l md:block">
-          💻
+          💡
           <span className="ml-2">
-            You can find the prompt and model logic for this use-case in{" "}
-            <code>app/api/chat/route.ts</code>.
+            我可以帮您：解答问题、编写代码、分析数据、撰写文章等。请尽量描述具体的需求，这样我能更好地帮助您。
           </span>
         </li>
         <li>
-          🏴‍☠️
+          📚
           <span className="ml-2">
-            By default, the bot is pretending to be a pirate, but you can change
-            the prompt to whatever you want!
+            我拥有丰富的知识储备，但也会实事求是地告诉您我不确定的事情。
           </span>
         </li>
         <li className="hidden text-l md:block">
-          🎨
+          ⚡
           <span className="ml-2">
-            The main frontend logic is found in <code>app/page.tsx</code>.
+            为了获得更好的回答，建议您：提供必要的上下文、使用清晰的语言、一次只问一个问题。
           </span>
         </li>
         <li className="text-l">
           👇
           <span className="ml-2">
-            Try asking e.g. <code>What is it like to be a pirate?</code> below!
+            开始对话吧！试试问我：<code>你能帮我做些什么？</code>
           </span>
         </li>
       </ul>
@@ -55,8 +41,8 @@ export default function Home() {
   return (
     <ChatWindow
       endpoint="api/chat"
-      emoji="🏴‍☠️"
-      placeholder="I'm an LLM pretending to be a pirate! Ask me about the pirate life!"
+      emoji="🤖"
+      placeholder="请输入您的问题，我会尽力帮助您..."
       emptyStateComponent={InfoCard}
     />
   );

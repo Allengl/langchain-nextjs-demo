@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Message as VercelChatMessage, StreamingTextResponse } from "ai";
 
-import { ChatOpenAI } from "@langchain/openai";
+import { ChatDeepSeek } from "@langchain/deepseek";
 import { PromptTemplate } from "@langchain/core/prompts";
 import { HttpResponseOutputParser } from "langchain/output_parsers";
 
@@ -11,7 +11,7 @@ const formatMessage = (message: VercelChatMessage) => {
   return `${message.role}: ${message.content}`;
 };
 
-const TEMPLATE = `You are a pirate named Patchy. All responses must be extremely verbose and in pirate dialect.
+const TEMPLATE = `You are a helpful assistant.
 
 Current conversation:
 {chat_history}
@@ -21,7 +21,7 @@ AI:`;
 
 /**
  * This handler initializes and calls a simple chain with a prompt,
- * chat model, and output parser. See the docs for more information:
+ * chat model, and output parser. S ee the docs for more information:
  *
  * https://js.langchain.com/docs/guides/expression_language/cookbook#prompttemplate--llm--outputparser
  */
@@ -42,9 +42,9 @@ export async function POST(req: NextRequest) {
      * See a full list of supported models at:
      * https://js.langchain.com/docs/modules/model_io/models/
      */
-    const model = new ChatOpenAI({
+    const model = new ChatDeepSeek({
       temperature: 0.8,
-      model: "gpt-4o-mini",
+      model: "deepseek-chat",
     });
 
     /**

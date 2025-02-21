@@ -5,78 +5,46 @@ export default function AgentsPage() {
   const InfoCard = (
     <GuideInfoBox>
       <ul>
-        <li className="hidden text-l md:block">
-          🔗
+        <li className="text-l">
+          🔍
           <span className="ml-2">
-            This template showcases how to perform retrieval with a{" "}
-            <a href="https://js.langchain.com/" target="_blank">
-              LangChain.js
-            </a>{" "}
-            chain and the Vercel{" "}
-            <a href="https://sdk.vercel.ai/docs" target="_blank">
-              AI SDK
-            </a>{" "}
-            in a{" "}
-            <a href="https://nextjs.org/" target="_blank">
-              Next.js
-            </a>{" "}
-            project.
+            欢迎使用知识库检索助手！我可以帮您在已上传的文档中快速查找相关信息并给出准确答案。
           </span>
         </li>
         <li className="hidden text-l md:block">
-          🪜
-          <span className="ml-2">The chain works in two steps:</span>
+          ⚙️
+          <span className="ml-2">工作流程：</span>
           <ul>
             <li className="ml-4">
               1️⃣
               <span className="ml-2">
-                First, it rephrases the input question into a
-                &quot;standalone&quot; question, dereferencing pronouns based on
-                the chat history.
+                首先，我会理解您的问题，并结合上下文将其转化为明确的查询语句
               </span>
             </li>
             <li className="ml-4">
               2️⃣
               <span className="ml-2">
-                Then, it queries the retriever for documents similar to the
-                dereferenced question and composes an answer.
+                然后，我会在知识库中检索相关文档，并基于检索结果为您组织完整的答案
               </span>
             </li>
           </ul>
         </li>
-        <li className="hidden text-l md:block">
-          💻
-          <span className="ml-2">
-            You can find the prompt and model logic for this use-case in{" "}
-            <code>app/api/chat/retrieval/route.ts</code>.
-          </span>
-        </li>
         <li>
-          🐶
+          📝
           <span className="ml-2">
-            By default, the agent is pretending to be a talking puppy, but you
-            can change the prompt to whatever you want!
-          </span>
-        </li>
-        <li className="text-l">
-          🎨
-          <span className="ml-2">
-            The main frontend logic is found in{" "}
-            <code>app/retrieval/page.tsx</code>.
+            使用方法：先上传您想要咨询的文档，然后针对文档内容提出具体问题
           </span>
         </li>
         <li className="hidden text-l md:block">
-          🔱
+          💡
           <span className="ml-2">
-            Before running this example on your own, you&apos;ll first need to
-            set up a Supabase vector store. See the README for more details.
+            小贴士：问题越具体，答案越准确。我只能回答基于已上传文档的内容。
           </span>
         </li>
         <li className="text-l">
           👇
           <span className="ml-2">
-            Upload some text, then try asking e.g.{" "}
-            <code>What is a document loader?</code> below!
+            开始体验吧！上传文档后，可以尝试提问：<code>这份文档主要讲了什么？</code>
           </span>
         </li>
       </ul>
@@ -85,12 +53,10 @@ export default function AgentsPage() {
   return (
     <ChatWindow
       endpoint="api/chat/retrieval"
+      emoji="🔍"
+      placeholder="请输入您关于文档的问题..."
       emptyStateComponent={InfoCard}
       showIngestForm={true}
-      placeholder={
-        'I\'ve got a nose for finding the right documents! Ask, "What is a document loader?"'
-      }
-      emoji="🐶"
     />
   );
 }

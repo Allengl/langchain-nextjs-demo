@@ -18,7 +18,7 @@ export function UploadDocumentsForm() {
       }),
     });
     if (response.status === 200) {
-      setDocument("Uploaded!");
+      setDocument("上传成功!");
     } else {
       const json = await response.json();
       if (json.error) {
@@ -57,7 +57,7 @@ export function UploadDocumentsForm() {
           </svg>
           <span className="sr-only">Loading...</span>
         </div>
-        <span className={isLoading ? "hidden" : ""}>Upload</span>
+        <span className={isLoading ? "hidden" : ""}>上传</span>
       </Button>
     </form>
   );
