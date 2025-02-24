@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 
-import { Milvus } from "@langchain/community/vectorstores/milvus";
-import { MilvusClient } from '@zilliz/milvus2-sdk-node';
 import { OllamaEmbeddings } from "@langchain/ollama";
+import { Pinecone } from "@pinecone-database/pinecone";
+import { PineconeStore } from "@langchain/pinecone";
+
 // export const runtime = "edge";
 
 // Before running, follow set-up instructions at
@@ -43,25 +44,28 @@ export async function POST(req: NextRequest) {
 
     const splitDocuments = await splitter.createDocuments([text]);
 
+    const client = new Pinecone({
+      apiKey: process.env.PINECONE_API_KEY!,
+    });
+
+    const pineconeIndex = client.Index("demo");
+
 
     const embeddings = new OllamaEmbeddings({
       model: process.env.OLLAMA_MODEL!,
       baseUrl: process.env.OLLAMA_BASE_URL!,
     });
 
-    const vectorstore = await Milvus.fromTexts(
-      [""],
-      [""],
+    const vectorStore = await PineconeStore.fromDocuments(
+      splitDocuments,
       embeddings,
       {
-        collectionName: "test",
-        vectorField: 'vectors',
-        clientConfig: {
-          address: process.env.MILVUS_ADDRESS!,
-        },
+        // @ts-ignore
+        pineconeIndex: pineconeIndex,
       }
     );
 
+    console.log("Vector store created", vectorStore);
 
 
 

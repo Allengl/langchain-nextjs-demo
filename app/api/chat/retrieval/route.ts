@@ -1,16 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Message as VercelChatMessage, StreamingTextResponse } from "ai";
-import { Milvus } from "@langchain/community/vectorstores/milvus";
 import { ChatDeepSeek } from "@langchain/deepseek";
 import { OllamaEmbeddings } from "@langchain/ollama";
 import { PromptTemplate } from "@langchain/core/prompts";
 import { Document } from "@langchain/core/documents";
 import { RunnableSequence } from "@langchain/core/runnables";
 import { BytesOutputParser, StringOutputParser } from "@langchain/core/output_parsers";
-
+import { Pinecone } from "@pinecone-database/pinecone";
+import { PineconeStore } from "@langchain/pinecone";
 // 环境变量检查
 const validateEnvironmentVariables = () => {
-  const requiredEnvVars = ["OLLAMA_MODEL", "OLLAMA_BASE_URL", "MILVUS_ADDRESS"];
+  const requiredEnvVars = ["OLLAMA_MODEL", "OLLAMA_BASE_URL", "PINECONE_API_KEY", "PINECONE_INDEX"];
   for (const envVar of requiredEnvVars) {
     if (!process.env[envVar]) {
       throw new Error(`Missing environment variable: ${envVar}`);
@@ -41,17 +41,14 @@ const initializeVectorStore = async () => {
     baseUrl: process.env.OLLAMA_BASE_URL!,
   });
 
-  return Milvus.fromExistingCollection(embeddings, {
-    collectionName: "test",
-    vectorField: "vectors",
-    clientConfig: {
-      address: process.env.MILVUS_ADDRESS!,
-    },
-    indexCreateOptions: {
-      metric_type: "COSINE",
-      index_type: "HNSW",
-    },
+  const pinecone = new Pinecone({
+    apiKey: process.env.PINECONE_API_KEY!,
+  });
+  const pineconeIndex = pinecone.Index("demo");
 
+  return PineconeStore.fromExistingIndex(embeddings, {
+    // @ts-ignore
+    pineconeIndex,
   });
 };
 
@@ -59,7 +56,7 @@ const initializeVectorStore = async () => {
 const initializeModel = () => {
   return new ChatDeepSeek({
     model: "deepseek-chat",
-    temperature: 0.2,
+    temperature: 0.7,
   });
 };
 
@@ -107,6 +104,8 @@ export async function POST(req: NextRequest) {
     const model = initializeModel();
     const vectorstore = await initializeVectorStore();
 
+    console.log(vectorstore)
+
     // 定义独立问题链
     const standaloneQuestionChain = RunnableSequence.from([
       condenseQuestionPrompt,
@@ -116,13 +115,12 @@ export async function POST(req: NextRequest) {
 
     // 定义检索链
     const retriever = vectorstore.asRetriever({
-      searchType: "similarity",
-      k: 4,
-      filter: "",
+      k: 2,
     });
 
     const retrievalChain = retriever.pipe(combineDocumentsFn);
 
+    console.log(retriever)
     // 定义回答链
     const answerChain = RunnableSequence.from([
       {
