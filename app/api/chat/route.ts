@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { Message as VercelChatMessage, StreamingTextResponse } from "ai";
 
 import { ChatDeepSeek } from "@langchain/deepseek";
+
+import { ChatOpenAI, OpenAI } from "@langchain/openai";
+
 import { PromptTemplate } from "@langchain/core/prompts";
 import { HttpResponseOutputParser } from "langchain/output_parsers";
 
@@ -42,10 +45,17 @@ export async function POST(req: NextRequest) {
      * See a full list of supported models at:
      * https://js.langchain.com/docs/modules/model_io/models/
      */
-    const model = new ChatDeepSeek({
+
+
+    const model = new ChatOpenAI({
+      apiKey: process.env.DEEPSEEK_API_KEY!,
+      model: "deepseek-r1-250120",
       temperature: 0.8,
-      model: "deepseek-chat",
+      configuration: {
+        baseURL: process.env.DEEPSEEK_BASE_URL!
+      }
     });
+
 
     /**
      * Chat models stream message chunks rather than bytes, so this

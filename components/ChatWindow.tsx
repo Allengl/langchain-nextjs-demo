@@ -208,7 +208,7 @@ export function ChatWindow(props: {
     setIntermediateStepsLoading(false);
 
     if (!response.ok) {
-      toast.error(`Error while processing your request`, {
+      toast.error(`出错了`, {
         description: json.error,
       });
       return;

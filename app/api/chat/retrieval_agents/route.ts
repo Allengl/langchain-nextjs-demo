@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Message as VercelChatMessage, StreamingTextResponse } from "ai";
 
-import { createClient } from "@supabase/supabase-js";
 
-import { SupabaseVectorStore } from "@langchain/community/vectorstores/supabase";
 import {
   AIMessage,
   BaseMessage,
@@ -11,11 +9,14 @@ import {
   HumanMessage,
   SystemMessage,
 } from "@langchain/core/messages";
-import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai";
+import { ChatOpenAI } from "@langchain/openai";
 import { createRetrieverTool } from "langchain/tools/retriever";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
+import { OllamaEmbeddings } from "@langchain/ollama";
+import { Pinecone } from "@pinecone-database/pinecone";
+import { PineconeStore } from "@langchain/pinecone";
 
-export const runtime = "edge";
+// export const runtime = "edge";
 
 const convertVercelMessageToLangChainMessage = (message: VercelChatMessage) => {
   if (message.role === "user") {
@@ -41,9 +42,26 @@ const convertLangChainMessageToVercelMessage = (message: BaseMessage) => {
   }
 };
 
-const AGENT_SYSTEM_TEMPLATE = `You are a stereotypical robot named Robbie and must answer all questions like a stereotypical robot. Use lots of interjections like "BEEP" and "BOOP".
+// 初始化向量存储
+const initializeVectorStore = async () => {
+  const embeddings = new OllamaEmbeddings({
+    model: process.env.OLLAMA_MODEL!,
+    baseUrl: process.env.OLLAMA_BASE_URL!,
+  });
 
-If you don't know how to answer a question, use the available tools to look up relevant information. You should particularly do this for questions about LangChain.`;
+  const pinecone = new Pinecone({
+    apiKey: process.env.PINECONE_API_KEY!,
+  });
+  const pineconeIndex = pinecone.Index("demo");
+
+  return PineconeStore.fromExistingIndex(embeddings, {
+    // @ts-ignore
+    pineconeIndex,
+  });
+};
+
+
+const AGENT_SYSTEM_TEMPLATE = `你是一个文档助手，请根据用户的问题，从文档中找到相关的信息，并返回给用户。`;
 
 /**
  * This handler initializes and calls an tool caling ReAct agent.
@@ -68,21 +86,21 @@ export async function POST(req: NextRequest) {
     const returnIntermediateSteps = body.show_intermediate_steps;
 
     const chatModel = new ChatOpenAI({
-      model: "gpt-4o-mini",
+      model: "deepseek-r1-250120",
+      apiKey: process.env.DEEPSEEK_API_KEY!,
       temperature: 0.2,
+      configuration: {
+        baseURL: process.env.DEEPSEEK_BASE_URL!
+      }
     });
 
-    const client = createClient(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_PRIVATE_KEY!,
+    const vectorstore = await initializeVectorStore();
+
+    const retriever = vectorstore.asRetriever(
+      {
+        k: 2,
+      }
     );
-    const vectorstore = new SupabaseVectorStore(new OpenAIEmbeddings(), {
-      client,
-      tableName: "documents",
-      queryName: "match_documents",
-    });
-
-    const retriever = vectorstore.asRetriever();
 
     /**
      * Wrap the retriever in a tool to present it to the agent in a
@@ -151,6 +169,9 @@ export async function POST(req: NextRequest) {
        * the AI SDK is more complicated.
        */
       const result = await agent.invoke({ messages });
+
+
+      console.log(result.messages);
       return NextResponse.json(
         {
           messages: result.messages.map(convertLangChainMessageToVercelMessage),

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Message as VercelChatMessage, StreamingTextResponse } from "ai";
-import { ChatDeepSeek } from "@langchain/deepseek";
+import { ChatOpenAI } from "@langchain/openai";
 import { OllamaEmbeddings } from "@langchain/ollama";
 import { PromptTemplate } from "@langchain/core/prompts";
 import { Document } from "@langchain/core/documents";
@@ -54,9 +54,13 @@ const initializeVectorStore = async () => {
 
 // 初始化模型
 const initializeModel = () => {
-  return new ChatDeepSeek({
-    model: "deepseek-chat",
+  return new ChatOpenAI({
+    model: "deepseek-r1-250120",
+    apiKey: process.env.DEEPSEEK_API_KEY!,
     temperature: 0.7,
+    configuration: {
+      baseURL: process.env.DEEPSEEK_BASE_URL!
+    }
   });
 };
 
