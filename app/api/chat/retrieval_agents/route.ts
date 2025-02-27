@@ -15,6 +15,7 @@ import { createReactAgent } from "@langchain/langgraph/prebuilt";
 import { OllamaEmbeddings } from "@langchain/ollama";
 import { Pinecone } from "@pinecone-database/pinecone";
 import { PineconeStore } from "@langchain/pinecone";
+import { ChatDeepSeek } from "@langchain/deepseek";
 
 // export const runtime = "edge";
 
@@ -85,13 +86,10 @@ export async function POST(req: NextRequest) {
       .map(convertVercelMessageToLangChainMessage);
     const returnIntermediateSteps = body.show_intermediate_steps;
 
-    const chatModel = new ChatOpenAI({
-      model: "deepseek-r1-250120",
-      apiKey: process.env.DEEPSEEK_API_KEY!,
+    const chatModel = new ChatDeepSeek({
+      model: "deepseek-chat",
+      apiKey: process.env.DEEPSEEK_KEY!,
       temperature: 0.2,
-      configuration: {
-        baseURL: process.env.DEEPSEEK_BASE_URL!
-      }
     });
 
     const vectorstore = await initializeVectorStore();
