@@ -58,9 +58,9 @@ export default function RootLayout({
                 </ActiveLink> */}
                 {/* <ActiveLink href="/agents">🦜 Agents</ActiveLink> */}
                 <ActiveLink href="/retrieval">🐶 知识库检索</ActiveLink>
-                <ActiveLink href="/retrieval_agents">
+                {/* <ActiveLink href="/retrieval_agents">
                   🤖 Retrieval Agents
-                </ActiveLink>
+                </ActiveLink> */}
                 {/* <ActiveLink href="/ai_sdk">
                   🌊 LangChain x AI SDK RSC
                 </ActiveLink> */}

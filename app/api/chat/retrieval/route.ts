@@ -64,12 +64,7 @@ Question: {question}
 `;
 const answerPrompt = PromptTemplate.fromTemplate(ANSWER_TEMPLATE);
 
-/**
- * This handler initializes and calls a retrieval chain. It composes the chain using
- * LangChain Expression Language. See the docs for more information:
- *
- * https://js.langchain.com/v0.2/docs/how_to/qa_chat_history_how_to/
- */
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
